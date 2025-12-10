@@ -1,25 +1,26 @@
-from openai import OpenAI
+from anthropic import Anthropic
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key = api_key)
+client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-MODEL = "gpt-5-chat-latest" 
+MODEL = "claude-sonnet-4-5-20250929"
 TEMPERATURE = 0.15
 
 
 def call_llm(system_prompt: str, user_content: str) -> str:
-    response = client.chat.completions.create(
+    response = client.messages.create(
         model=MODEL,
         temperature=TEMPERATURE,
+        max_tokens=1000,
+        system=system_prompt,
         messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_content},
+            {"role": "user", "content": user_content}
         ],
     )
-    return response.choices[0].message.content
+
+    return response.content[0].text
 
 
 # === System prompts ===
@@ -53,7 +54,7 @@ AHLLM_SYSTEM = (
 )
 
 
-def invoke_gpt_5(user_prompt: str) -> str:
+def invoke_claude_4_5(user_prompt: str) -> str:
 
     enhanced_bundle = call_llm(
         system_prompt=PELLM_SYSTEM,

@@ -1,25 +1,23 @@
-from openai import OpenAI
 from dotenv import load_dotenv
+import cohere
 import os
 
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key = api_key)
+api_key = os.getenv("COHERE_API_KEY")
+client = cohere.Client(api_key)
 
-MODEL = "gpt-5-chat-latest" 
+MODEL = "command-a-03-2025"
 TEMPERATURE = 0.15
 
 
 def call_llm(system_prompt: str, user_content: str) -> str:
-    response = client.chat.completions.create(
+    full_prompt = f"System: {system_prompt}\nUser: {user_content}"
+    response = client.chat(
         model=MODEL,
         temperature=TEMPERATURE,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_content},
-        ],
+        message=full_prompt
     )
-    return response.choices[0].message.content
+    return response.text
 
 
 # === System prompts ===
@@ -53,8 +51,7 @@ AHLLM_SYSTEM = (
 )
 
 
-def invoke_gpt_5(user_prompt: str) -> str:
-
+def invoke_cohere(user_prompt: str) -> str:
     enhanced_bundle = call_llm(
         system_prompt=PELLM_SYSTEM,
         user_content=user_prompt,
