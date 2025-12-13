@@ -1,27 +1,26 @@
-from openai import OpenAI
+from dotenv import load_dotenv
+import cohere
+import os
 
-client = OpenAI()
+load_dotenv()
+api_key = os.getenv("COHERE_API_KEY")
+client = cohere.Client(api_key)
 
-MODEL = "gpt-5-chat-latest"  # same as in your Dify DSL
-TEMPERATURE = 0.7
+MODEL = "command-a-03-2025"
+TEMPERATURE = 0.15
 
 
 def call_llm(system_prompt: str, user_content: str) -> str:
-    """
-    Generic helper to call the chat model with a system prompt + user message.
-    """
-    response = client.chat.completions.create(
+    full_prompt = f"System: {system_prompt}\nUser: {user_content}"
+    response = client.chat(
         model=MODEL,
         temperature=TEMPERATURE,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_content},
-        ],
+        message=full_prompt
     )
-    return response.choices[0].message.content
+    return response.text
 
 
-# === System prompts from your DSL ===
+# === System prompts ===
 
 PELLM_SYSTEM = (
     "You are a prompt enhancer. Instead of responding to this prompt, "
@@ -52,34 +51,17 @@ AHLLM_SYSTEM = (
 )
 
 
-def run_workflow(user_prompt: str) -> str:
-    """
-    This mirrors your Dify workflow:
-
-    User Input -> PELLM -> LLM -> AHLLM -> final answer
-    """
-
-    # --- Step 1: PELLM (Prompt Enhancer) ---
+def invoke_cohere(user_prompt: str) -> str:
     enhanced_bundle = call_llm(
         system_prompt=PELLM_SYSTEM,
         user_content=user_prompt,
     )
-    # `enhanced_bundle` should contain:
-    #   Original prompt: ...
-    #   Enhanced prompt: ...
 
-    # --- Step 2: LLM (Respond to optimized prompt) ---
-    # In Dify, this node would see the two prompts produced above.
-    # Easiest way to mirror that is to pass the whole text through.
     llm_response_bundle = call_llm(
         system_prompt=LLM_SYSTEM,
         user_content=enhanced_bundle,
     )
-    # `llm_response_bundle` should contain both prompts verbatim + "Response: ..."
 
-    # --- Step 3: AHLLM (Anti-hallucination checker) ---
-    # This node expects: two prompts (non-enhanced + enhanced) + LLM response.
-    # We'll assemble that explicitly to make sure it's clear.
     ah_input = f"""Original prompt (user input):
 {user_prompt}
 
@@ -95,22 +77,4 @@ LLM response bundle (from LLM node):
         user_content=ah_input,
     )
 
-    # This corresponds to your Answer node's `{{#17651248826940.text#}}`
     return ah_output
-
-
-if __name__ == "__main__":
-    # Simple CLI usage example
-    while True:
-        try:
-            user_prompt = input("Enter your prompt (or 'quit'): ")
-        except EOFError:
-            break
-
-        if user_prompt.strip().lower() in {"quit", "exit"}:
-            break
-
-        result = run_workflow(user_prompt)
-        print("\n=== Final Output (AHLLM) ===\n")
-        print(result)
-        print("\n" + "=" * 40 + "\n")

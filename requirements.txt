@@ -1,0 +1,6 @@
+openai
+flask
+flask_cors
+python-dotenv
+anthropic
+cohere

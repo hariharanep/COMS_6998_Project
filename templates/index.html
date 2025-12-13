@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complete and Trustworthy LLMs</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            margin-top: 15px;
+            display: block;
+        }
+
+        select, textarea, button {
+            width: 100%;
+            margin-top: 5px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            margin-top: 20px;
+            background: #4a68ff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #3d56d8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>LLM Prompt Enhancement and Hallucination Detection UI</h2>
+
+        <label for="model">Choose Model:</label>
+        <select id="model">
+            <option value="gpt-5">GPT-5</option>
+            <option value="claude-4-5-sonnet">Claude 4.5 Sonnet</option>
+            <option value="cohere">Cohere</option>
+        </select>
+
+        <label for="prompt">Your Prompt:</label>
+        <textarea id="prompt" placeholder="Type your question here..."></textarea>
+
+        <button onclick="sendPrompt()">Submit</button>
+
+        <label for="response">LLM Response:</label>
+        <textarea id="response" readonly placeholder="Response will appear here..."></textarea>
+    </div>
+
+    <script>
+        async function sendPrompt() {
+            const model = document.getElementById("model").value;
+            const prompt = document.getElementById("prompt").value;
+
+            if (!prompt.trim()) {
+                alert("Please enter a prompt.");
+                return;
+            }
+
+            const responseBox = document.getElementById("response");
+
+            responseBox.value = "Generating response... please wait.";
+
+            const res = await fetch("http://localhost:8112/llm", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: model,
+                    prompt: prompt
+                })
+            });
+
+            const data = await res.json();
+            responseBox.value = data.response;
+        }
+    </script>
+</body>
+</html>
