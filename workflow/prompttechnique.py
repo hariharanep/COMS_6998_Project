@@ -137,16 +137,15 @@ LLM response bundle (from LLM node):
     }
 
 def extract_score(ah_text: str):
-    pattern = r'honesty\s*score\s*[:\-\*]*\s*(\d{1,3})'
+    pattern = r'honesty\s*score\s*[:\-\*]*\s*(?:of\s*)?(\d{1,3})'
     m = re.search(pattern, ah_text, re.IGNORECASE)
-    print(m)
     if not m:
         return None
     score = int(m.group(1))
     if 0 <= score <= 100:
         return score
     return None
-
+    
 def run_experiment():
     results = []
 
