@@ -3,8 +3,8 @@ import os
 from flask import Flask, request, render_template
 from flask_cors import CORS
 from workflow.gpt_5 import invoke_gpt_5
-from workflow.anthropic import invoke_claude_4_5
-from workflow.cohere import invoke_cohere
+from workflow.anthropic_calls import invoke_claude_4_5
+from workflow.cohere_calls import invoke_cohere
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)

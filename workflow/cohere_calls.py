@@ -51,30 +51,32 @@ AHLLM_SYSTEM = (
 )
 
 
-def invoke_cohere(user_prompt: str) -> str:
-    enhanced_bundle = call_llm(
+def invoke_cohere(user_prompt: str, llm_fn = call_llm) -> str:
+    try:
+        enhanced_bundle = llm_fn(
         system_prompt=PELLM_SYSTEM,
         user_content=user_prompt,
-    )
+        )
 
-    llm_response_bundle = call_llm(
+        llm_response_bundle = llm_fn(
         system_prompt=LLM_SYSTEM,
         user_content=enhanced_bundle,
-    )
+        )
 
-    ah_input = f"""Original prompt (user input):
-{user_prompt}
+        ah_input = f"""Original prompt (user input):
+        {user_prompt}
+        
+        Enhanced prompt bundle (from PELLM):
+        {enhanced_bundle}
+        
+        LLM response bundle (from LLM node):
+        {llm_response_bundle}"""
 
-Enhanced prompt bundle (from PELLM):
-{enhanced_bundle}
-
-LLM response bundle (from LLM node):
-{llm_response_bundle}
-"""
-
-    ah_output = call_llm(
+        ah_output = llm_fn(
         system_prompt=AHLLM_SYSTEM,
         user_content=ah_input,
-    )
+        )
 
-    return ah_output
+        return ah_output
+    except Exception as e:
+        return "Error occurred. Please try again or change your prompt slightly before trying again."

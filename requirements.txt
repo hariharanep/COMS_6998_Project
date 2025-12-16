@@ -4,3 +4,5 @@ flask_cors
 python-dotenv
 anthropic
 cohere
+pytest
+pytest-mock
