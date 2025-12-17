@@ -27,11 +27,14 @@ COMS_6998_Project/
 │   └── index.html
 └── workflow/
     ├── gpt_5.py
-    ├── anthropic.py
-    ├── cohere.py
+    ├── anthropic_calls.py
+    ├── cohere_calls.py
     ├── prompttechnique.py
     ├── prompt-technique-test.py
     ├── experiment_results-test.json
+    ├── test_anthropic.py
+    ├── test_cohere.py
+    ├── test_gpt_5.py
     └── plot.py
 ````
 
@@ -130,7 +133,7 @@ This design ensures consistency across providers and makes experimental comparis
 
 ---
 
-### `workflow/anthropic.py` — Anthropic (Claude) Implementation
+### `workflow/anthropic_calls.py` — Anthropic (Claude) Implementation
 
 * Mirrors the structure of `gpt_5.py`.
 * Uses the Anthropic SDK and reads `ANTHROPIC_API_KEY`.
@@ -143,7 +146,7 @@ This design ensures consistency across providers and makes experimental comparis
 
 ---
 
-### `workflow/cohere.py` — Cohere Implementation
+### `workflow/cohere_calls.py` — Cohere Implementation
 
 * Implements the same three-agent pipeline using Cohere’s chat API.
 * Reads `COHERE_API_KEY` from the environment.
